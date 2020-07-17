@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.firesoon.firesoondh.mapper.common.DBOperationMapper">
+    <update id="createTable">
+        ${sql}
+    </update>
+    <delete id="dropTable">
+        drop table
+        <choose>
+            <when test="schema!=null and schema!=''">
+                ${schema}.${tableName}
+            </when>
+            <otherwise>
+                ${tableName}
+            </otherwise>
+        </choose>
+
+    </delete>
+    <select id="selectTableExist" resultType="java.lang.Boolean">
+        SELECT COUNT(1) FROM
+        <choose>
+            <when test="schema!=null and schema!=''">
+                ALL_TABLES
+                WHERE OWNER = UPPER(#{schema})
+                AND TABLE_NAME = UPPER(#{tableName})
+            </when>
+            <otherwise>
+                user_tables where TABLE_NAME = UPPER(#{tableName})
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

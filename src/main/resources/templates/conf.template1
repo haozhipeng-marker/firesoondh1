@@ -1,0 +1,79 @@
+prod = dev
+spark = {
+  retry = 1
+  run.model = batch
+  app.name = "Roger_test"
+  storage.level = DISK_ONLY
+  app.window {
+    second = 3
+  }
+}
+
+
+logic {
+  input {
+    name = start
+    beanClass = com.firesoon.input.NoStreamImpl
+    view = job_info
+  }
+
+  units = [
+        {
+          name = "oracleReader"
+          actor = com.firesoon.component.read.OracleReader // 必填
+          db = cpw // 必填，oracle数据库
+          table = JOB_INFO // 必填，oracle数据表
+          query = "select * from ZSS_OR_ZZD_DELETE_RECORDS" //必填，支持加各种条件筛选（后续会支持动态参数）
+          view = ZSS_OR_ZZD_DELETE_RECORDS // 必填，注册spark table
+          cache = false // 选填
+          fetchSize = 10000 // 选填
+        }
+
+    {
+      name = oracleWriter
+      actor = com.firesoon.component.write.OracleWriter
+      db = etl // 必填
+      table = ZSS_OR_ZZD_DELETE_RECORDS // 必填
+      batchSize = 1000 // 选填
+      timeout = 10 // 选填
+      mode = truncate // 默认是truncate
+
+    }
+
+    {
+      name = "pre"
+      actor = com.firesoon.component.calc.SQLCalculate
+      sqlFile = 001.sql
+    }
+
+  ]
+
+  blueprint = [
+    "start -> pre -> oracleReader ->oracleWriter"
+  ]
+}
+
+socket.input.host = 127.0.0.1
+socket.input.port = 9999
+
+dbs {
+  oracle {
+    cpw {
+      type = normal
+      url = "jdbc:oracle:thin:@172.16.3.73:1521/hdctest"
+      username = "cpw"
+      password = "cpw"
+      driver = "oracle.jdbc.OracleDriver"
+    }
+    model {
+      type = normal
+      url = "jdbc:oracle:thin:@172.16.3.73:1521/hdctest"
+      username = "model"
+      password = "model"
+      driver = "oracle.jdbc.OracleDriver"
+    }
+  }
+
+}
+
+include "system.conf"

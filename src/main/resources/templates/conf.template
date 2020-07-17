@@ -1,0 +1,69 @@
+prod = dev
+spark = {
+  retry = 1
+  run.model = batch
+  app.name = "Roger_test"
+  storage.level = DISK_ONLY
+  app.window {
+    second = 3
+  }
+}
+
+
+logic {
+  input {
+    name = start
+    beanClass = com.firesoon.input.NoStreamImpl
+    view = job_info
+  }
+
+  units = [
+    <#list units as unit>
+        {
+          name = "${unit.name}"
+          actor = "${unit.actor}"
+          db = "${unit.db}"
+          table = "${unit.table}"
+          batchSize = ${unit.batchSize?c}
+          timeout = ${unit.timeout?c}
+          mode = "${unit.mode!}"
+          targetTablePartition = "${unit.targetTablePartition!}"
+          sourceTablePartition = "${unit.sourceTablePartition!}"
+          priKey = "${unit.priKey!}"
+          t_table = "${unit.tTable!}"
+          dllPreSql = "${unit.dllPreSql!}"
+          sqlFile = "${unit.sqlFile!}"
+          query = "${unit.query!}"
+          fetchSize = ${unit.fetchSize?c}
+          cache = ${unit.cache?c}
+          view = "${unit.view!}"
+        }
+    </#list>
+
+  ]
+
+  blueprint = [
+    "<#list blueprint as a><#if a_has_next>${a}-><#else>${a}</#if></#list>"
+  ]
+}
+
+socket.input.host = 127.0.0.1
+socket.input.port = 9999
+
+dbs {
+  <#list dbs?keys as key>
+    ${key} {
+      <#list dbs[key] as db>
+         ${db.dbName} {
+               type = "${db.type!}"
+               url = "${db.url}"
+               username = "${db.username}"
+               password = "${db.password}"
+               driver = "${db.driver}"
+         }
+      </#list>
+    }
+  </#list>
+}
+
+include "system.conf"

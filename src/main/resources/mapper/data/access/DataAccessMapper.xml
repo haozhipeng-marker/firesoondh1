@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.firesoon.firesoondh.mapper.data.access.DataAccessMapper">
+    <resultMap id="BaseResultMap" type="com.firesoon.firesoondh.model.dotype.data.access.DataAccessDO">
+        <id column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="DATA_SOURCE_ID" jdbcType="DECIMAL" property="dataSourceId"/>
+        <result column="DATA_SOURCE_TYPE" jdbcType="VARCHAR" property="dataSourceType"/>
+        <result column="DATA_SOURCE_NAME" jdbcType="VARCHAR" property="dataSourceName"/>
+        <result column="ACCESS_NAME" jdbcType="VARCHAR" property="accessName"/>
+        <result column="ACCESS_DESC" jdbcType="VARCHAR" property="accessDesc"/>
+        <result column="CREATOR_ID" jdbcType="DECIMAL" property="creatorId"/>
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <resultMap id="DataAccessVO" type="com.firesoon.firesoondh.model.votype.data.access.DataAccessVO">
+        <result column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="DATA_SOURCE_TYPE" jdbcType="VARCHAR" property="dataSourceType"/>
+        <result column="DATA_SOURCE_ID" jdbcType="DECIMAL" property="dataSourceId"/>
+        <result column="DATA_SOURCE_NAME" jdbcType="VARCHAR" property="dataSourceName"/>
+        <result column="ACCESS_NAME" jdbcType="VARCHAR" property="name"/>
+        <result column="ACCESS_DESC" jdbcType="VARCHAR" property="desc"/>
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime"/>
+        <collection property="tableList"
+                    ofType="com.firesoon.firesoondh.model.votype.data.access.DataAccessVO$Table"
+                    select="com.firesoon.firesoondh.mapper.data.access.DataAccessConfMapper.selectByDataAccessId"
+                    column="id">
+        </collection>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+       ID, DATA_SOURCE_ID,DATA_SOURCE_TYPE,
+       DATA_SOURCE_NAME,ACCESS_NAME,ACCESS_DESC,
+       CREATOR_ID,CREATE_TIME,UPDATE_TIME
+  </sql>
+    <select id="dataAccessTreeList" resultMap="DataAccessVO">
+        select
+        <include refid="BaseColumnList"/>
+        from
+        DATA_ACCESS
+        <where>
+            <if test="search!=null and search!=''">
+                instr(ACCESS_NAME,#{search})>0
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

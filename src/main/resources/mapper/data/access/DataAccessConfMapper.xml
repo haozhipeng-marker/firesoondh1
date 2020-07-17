@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.firesoon.firesoondh.mapper.data.access.DataAccessConfMapper">
+    <resultMap id="BaseResultMap" type="com.firesoon.firesoondh.model.dotype.data.access.DataAccessConfDO">
+        <id column="ID" jdbcType="VARCHAR" property="id"/>
+        <id column="DATA_ACCESS_ID" jdbcType="VARCHAR" property="dataAccessId"/>
+        <result column="ORIGIN_TABLE" jdbcType="VARCHAR" property="originTable"/>
+        <result column="TARGET_TABLE" jdbcType="VARCHAR" property="targetTable"/>
+        <result column="IS_FULL" jdbcType="DECIMAL" property="isFull"/>
+        <result column="ADD_TYPE" jdbcType="DECIMAL" property="addType"/>
+        <result column="PRIMARY_KEY" jdbcType="VARCHAR" property="primaryKey"/>
+        <result column="FETCH_SIZE" jdbcType="DECIMAL" property="fetchSize"/>
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="PRE_SQL" jdbcType="CLOB" property="preSql"/>
+        <result column="FILTER_SQL" jdbcType="CLOB" property="filterSql"/>
+    </resultMap>
+
+    <resultMap id="DataAccessTableVO" type="com.firesoon.firesoondh.model.votype.data.access.DataAccessVO$Table">
+        <result column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="ORIGIN_TABLE" jdbcType="VARCHAR" property="name"/>
+        <result column="SYN_TYPE" jdbcType="VARCHAR" property="synType"/>
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+
+    <sql id="BaseColumnList">
+       ID, DATA_ACCESS_ID,ORIGIN_TABLE,TARGET_TABLE,
+       IS_FULL,ADD_TYPE,PRIMARY_KEY,FETCH_SIZE,
+       CREATE_TIME,UPDATE_TIME,PRE_SQL,FILTER_SQL
+  </sql>
+
+
+    <select id="selectByDataAccessId" resultMap="DataAccessTableVO">
+        select
+        <include refid="BaseColumnList"/>
+        ,case when IS_FULL=1 then '全量' when ADD_TYPE is not null then '增量' else '-' end SYN_TYPE
+        from
+        DATA_ACCESS_CONF
+        where DATA_ACCESS_ID = #{dataAccessId}
+    </select>
+</mapper>
